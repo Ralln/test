@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <title>第四关：逻辑拆弹专家</title>
+    <style>
+        body { font-family: 'Courier New', monospace; background: #c0c0c0; text-align: center; }
+        h1 { color: #000; }
+        #game-container {
+            display: inline-block;
+            background: #bdbdbd;
+            border: 3px solid #fff;
+            border-right-color: #7b7b7b;
+            border-bottom-color: #7b7b7b;
+            padding: 10px;
+        }
+        #grid {
+            display: grid;
+            grid-template-columns: repeat(9, 30px);
+            grid-template-rows: repeat(9, 30px);
+            border: 2px solid #7b7b7b;
+        }
+        .cell {
+            width: 30px;
+            height: 30px;
+            background: #bdbdbd;
+            border: 3px solid #fff;
+            border-right-color: #7b7b7b;
+            border-bottom-color: #7b7b7b;
+            box-sizing: border-box;
+            cursor: pointer;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .cell.revealed {
+            border: 1px solid #7b7b7b;
+            background: #bdbdbd;
+            cursor: default;
+        }
+        .cell.mine { background-color: red; }
+        /* 不同数字的颜色 */
+        .n1 { color: blue; } .n2 { color: green; } .n3 { color: red; }
+    </style>
+</head>
+<body>
+
+    <h1>第四关：扫雷</h1>
+    <p>清除所有地雷，真相就在废墟之下。</p >
+
+    <div id="game-container">
+        <div id="grid"></div>
+    </div>
+
+    <script>
+        const rows = 9;
+        const cols = 9;
+        const minesCount = 10;
+        let mines = [];
+        let revealedCount = 0;
+
+        const grid = document.getElementById('grid');
+
+        // 初始化网格
+        function init() {
+            // 生成地雷位置
+            let positions = Array.from({length: rows * cols}, (_, i) => i);
+            positions.sort(() => Math.random() - 0.5);
+            mines = positions.slice(0, minesCount);
+
+            for (let i = 0; i < rows * cols; i++) {
+                const cell = document.createElement('div');
+                cell.classList.add('cell');
+                cell.dataset.index = i;
+                cell.addEventListener('click', () => reveal(i));
+                // 右键标记旗帜（可选）
+                cell.addEventListener('contextmenu', (e) => {
+                    e.preventDefault();
+                    if (!cell.classList.contains('revealed')) {
+                        cell.innerText = cell.innerText === '🚩' ? '' : '🚩';
+                    }
+                });
+                grid.appendChild(cell);
+            }
+        }
+
+        function reveal(index) {
+            const cell = grid.children[index];
+            if (cell.classList.contains('revealed')) return;
+
+            if (mines.includes(index)) {
+                alert('💥 炸了！再来一次吧！');
+                location.reload();
+                return;
+            }
+
+            const mineCount = countMines(index);
+            cell.classList.add('revealed');
+            revealedCount++;
+
+            if (mineCount > 0) {
+                cell.innerText = mineCount;
+                cell.classList.add('n' + mineCount);
+            } else {
+                // 如果周围没雷，自动展开
+                const neighbors = getNeighbors(index);
+                neighbors.forEach(n => reveal(n));
+            }
+
+            // 胜利判定
+            if (revealedCount === rows * cols - minesCount) {
+                // 这里设置你的下一关答案！
+                alert('恭喜通关！下一关的密钥是：music');
+                // 或者直接跳转： window.location.href = '../music';
+            }
+        }
+
+        function countMines(index) {
+            return getNeighbors(index).filter(n => mines.includes(n)).length;
+        }
+
+        function getNeighbors(index) {
+            const r = Math.floor(index / cols);
+            const c = index % cols;
+            let neighbors = [];
+            for (let i = -1; i <= 1; i++) {
+                for (let j = -1; j <= 1; j++) {
+                    if (i === 0 && j === 0) continue;
+                    if (r + i >= 0 && r + i < rows && c + j >= 0 && c + j < cols) {
+                        neighbors.push((r + i) * cols + (c + j));
+                    }
+                }
+            }
+            return neighbors;
+        }
+
+        init();
+    </script>
+</body>
+</html>
