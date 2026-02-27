@@ -2,10 +2,11 @@
 <html lang="zh">
 <head>
     <meta charset="UTF-8">
-    <title>第四关：逻辑拆弹专家</title>
+    <title>第四关：拆弹专家</title>
     <style>
-        body { font-family: 'Courier New', monospace; background: #c0c0c0; text-align: center; }
-        h1 { color: #000; }
+        body { font-family: 'Courier New', monospace; background: #c0c0c0; text-align: center; padding-top: 20px; }
+        
+        /* 扫雷面板外框 */
         #game-container {
             display: inline-block;
             background: #bdbdbd;
@@ -13,13 +14,57 @@
             border-right-color: #7b7b7b;
             border-bottom-color: #7b7b7b;
             padding: 10px;
+            user-select: none;
         }
+
+        /* 顶部状态栏 */
+        #status-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #bdbdbd;
+            border: 2px solid #7b7b7b;
+            border-right-color: #fff;
+            border-bottom-color: #fff;
+            padding: 5px 10px;
+            margin-bottom: 10px;
+        }
+
+        .lcd-display {
+            background: #000;
+            color: #ff0000;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 24px;
+            font-weight: bold;
+            padding: 2px 5px;
+            border: 1px solid #7b7b7b;
+            min-width: 40px;
+        }
+
+        #face {
+            width: 30px;
+            height: 30px;
+            background: #bdbdbd;
+            border: 2px solid #fff;
+            border-right-color: #7b7b7b;
+            border-bottom-color: #7b7b7b;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+
+        /* 游戏网格 */
         #grid {
             display: grid;
             grid-template-columns: repeat(9, 30px);
             grid-template-rows: repeat(9, 30px);
             border: 2px solid #7b7b7b;
+            border-right-color: #fff;
+            border-bottom-color: #fff;
         }
+
         .cell {
             width: 30px;
             height: 30px;
@@ -34,22 +79,32 @@
             align-items: center;
             justify-content: center;
         }
+
         .cell.revealed {
             border: 1px solid #7b7b7b;
             background: #bdbdbd;
             cursor: default;
         }
-        .cell.mine { background-color: red; }
-        /* 不同数字的颜色 */
-        .n1 { color: blue; } .n2 { color: green; } .n3 { color: red; }
+
+        .cell.mine { background-color: #7b7b7b; }
+        .cell.mine-hit { background-color: red; }
+
+        /* 数字颜色 */
+        .n1 { color: blue; } .n2 { color: green; } .n3 { color: red; } 
+        .n4 { color: darkblue; } .n5 { color: darkred; } .n6 { color: teal; }
     </style>
 </head>
 <body>
 
     <h1>第四关：扫雷</h1>
-    <p>清除所有地雷，真相就在废墟之下。</p >
+    <p>找出所有隐藏的雷，你会得到新的指引。</p >
 
     <div id="game-container">
+        <div id="status-bar">
+            <div id="mine-count" class="lcd-display">010</div>
+            <div id="face" onclick="location.reload()">🙂</div>
+            <div id="timer" class="lcd-display">000</div>
+        </div>
         <div id="grid"></div>
     </div>
 
@@ -59,80 +114,142 @@
         const minesCount = 10;
         let mines = [];
         let revealedCount = 0;
+        let flags = 0;
+        let timerInterval = null;
+        let timeElapsed = 0;
+        let gameOver = false;
+        let firstClick = true;
 
-        const grid = document.getElementById('grid');
+        const gridElement = document.getElementById('grid');
+        const mineDisplay = document.getElementById('mine-count');
+        const timerDisplay = document.getElementById('timer');
+        const face = document.getElementById('face');
 
-        // 初始化网格
         function init() {
-            // 生成地雷位置
-            let positions = Array.from({length: rows * cols}, (_, i) => i);
-            positions.sort(() => Math.random() - 0.5);
-            mines = positions.slice(0, minesCount);
-
+            gridElement.innerHTML = '';
             for (let i = 0; i < rows * cols; i++) {
                 const cell = document.createElement('div');
                 cell.classList.add('cell');
                 cell.dataset.index = i;
-                cell.addEventListener('click', () => reveal(i));
-                // 右键标记旗帜（可选）
-                cell.addEventListener('contextmenu', (e) => {
-                    e.preventDefault();
-                    if (!cell.classList.contains('revealed')) {
-                        cell.innerText = cell.innerText === '🚩' ? '' : '🚩';
-                    }
-                });
-                grid.appendChild(cell);
+                cell.addEventListener('mousedown', (e) => handleMouse(e, i));
+                cell.addEventListener('contextmenu', (e) => e.preventDefault());
+                gridElement.appendChild(cell);
             }
+            mineDisplay.innerText = minesCount.toString().padStart(3, '0');
+        }
+
+        function handleMouse(e, index) {
+            if (gameOver) return;
+            
+            // 左键点击
+            if (e.button === 0) {
+                if (gridElement.children[index].innerText === '🚩') return;
+                
+                if (firstClick) {
+                    startTimer();
+                    generateMines(index);
+                    firstClick = false;
+                }
+                reveal(index);
+            } 
+            // 右键点击
+            else if (e.button === 2) {
+                toggleFlag(index);
+            }
+        }
+
+        function startTimer() {
+            timerInterval = setInterval(() => {
+                timeElapsed++;
+                timerDisplay.innerText = Math.min(timeElapsed, 999).toString().padStart(3, '0');
+            }, 1000);
+        }
+
+        function generateMines(excludeIndex) {
+            let positions = Array.from({length: rows * cols}, (_, i) => i);
+            positions = positions.filter(p => p !== excludeIndex); // 确保第一次点击不是雷
+            positions.sort(() => Math.random() - 0.5);
+            mines = positions.slice(0, minesCount);
+        }
+
+        function toggleFlag(index) {
+            const cell = gridElement.children[index];
+            if (cell.classList.contains('revealed')) return;
+
+            if (cell.innerText === '🚩') {
+                cell.innerText = '';
+                flags--;
+            } else {
+                cell.innerText = '🚩';
+                flags++;
+            }
+            mineDisplay.innerText = Math.max(minesCount - flags, 0).toString().padStart(3, '0');
         }
 
         function reveal(index) {
-            const cell = grid.children[index];
-            if (cell.classList.contains('revealed')) return;
+            const cell = gridElement.children[index];
+            if (cell.classList.contains('revealed') || cell.innerText === '🚩') return;
 
             if (mines.includes(index)) {
-                alert('💥 炸了！再来一次吧！');
-                location.reload();
+                endGame(false, index);
                 return;
             }
 
-            const mineCount = countMines(index);
+            const mCount = countMines(index);
             cell.classList.add('revealed');
             revealedCount++;
 
-            if (mineCount > 0) {
-                cell.innerText = mineCount;
-                cell.classList.add('n' + mineCount);
+            if (mCount > 0) {
+                cell.innerText = mCount;
+                cell.classList.add('n' + mCount);
             } else {
-                // 如果周围没雷，自动展开
-                const neighbors = getNeighbors(index);
-                neighbors.forEach(n => reveal(n));
+                getNeighbors(index).forEach(n => reveal(n));
             }
 
-            // 胜利判定
             if (revealedCount === rows * cols - minesCount) {
-                // 这里设置你的下一关答案！
-                alert('恭喜通关！下一关的密钥是：music');
-                // 或者直接跳转： window.location.href = '../music';
+                endGame(true);
             }
         }
 
-        function countMines(index) {
-            return getNeighbors(index).filter(n => mines.includes(n)).length;
+        function endGame(won, hitIndex) {
+            gameOver = true;
+            clearInterval(timerInterval);
+            
+            mines.forEach(m => {
+                const cell = gridElement.children[m];
+                cell.classList.add('revealed');
+                cell.classList.add('mine');
+                cell.innerText = '💣';
+                if (m === hitIndex) cell.classList.add('mine-hit');
+            });
+
+            if (won) {
+                face.innerText = '😎';
+                // 这里是下一关的提示，你可以改成任何你想要的答案
+                setTimeout(() => alert('おめてとう！1753'), 500);
+            } else {
+                face.innerText = '😵';
+            }
         }
 
         function getNeighbors(index) {
             const r = Math.floor(index / cols);
             const c = index % cols;
-            let neighbors = [];
+            let res = [];
             for (let i = -1; i <= 1; i++) {
                 for (let j = -1; j <= 1; j++) {
                     if (i === 0 && j === 0) continue;
-                    if (r + i >= 0 && r + i < rows && c + j >= 0 && c + j < cols) {
-                        neighbors.push((r + i) * cols + (c + j));
+                    let nr = r + i, nc = c + j;
+                    if (nr >= 0 && nr < rows && nc >= 0 && nc < cols) {
+                        res.push(nr * cols + nc);
                     }
                 }
             }
-            return neighbors;
+            return res;
+        }
+
+        function countMines(index) {
+            return getNeighbors(index).filter(n => mines.includes(n)).length;
         }
 
         init();
