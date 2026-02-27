@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <title>第二关 - 数织谜题</title>
+    <style>
+        body { text-align: center; font-family: 'Courier New', monospace; padding-top: 30px; background-color: #f4f4f4; }
+        .nonogram-container { display: inline-block; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
+        table { border-collapse: collapse; margin: 0 auto; }
+        td, th { border: 1px solid #ccc; width: 40px; height: 40px; text-align: center; vertical-align: middle; }
+        /* 提示数字的样式 */
+        .hint { background-color: #e9e9e9; font-weight: bold; font-size: 14px; color: #333; }
+        .row-hint { text-align: right; padding-right: 10px; width: 60px; }
+        .col-hint { text-align: center; padding-bottom: 5px; height: 60px; }
+        /* 游戏网格的样式 */
+        .cell { background-color: #fff; cursor: pointer; transition: background-color 0.2s; }
+        /* 玩家点击后变黑的类 (技术上需要JS，这里仅做样式演示) */
+        .cell.filled { background-color: #000; }
+    </style>
+</head>
+<body>
+
+    <h1>第二关：数字的逻辑</h1>
+    
+    <div class="nonogram-container">
+        <table>
+            <tr>
+                <th class="hint"></th> <th class="hint col-hint"></th> <th class="hint col-hint">1<br>1</th>
+                <th class="hint col-hint">3</th>
+                <th class="hint col-hint">1<br>1</th>
+                <th class="hint col-hint">2</th>
+            </tr>
+            
+            <tr>
+                <td class="hint row-hint">1</td>
+                <td class="cell" onclick="this.classList.toggle('filled')"></td>
+                <td class="cell" onclick="this.classList.toggle('filled')"></td>
+                <td class="cell" onclick="this.classList.toggle('filled')"></td>
+                <td class="cell" onclick="this.classList.toggle('filled')"></td>
+                <td class="cell" onclick="this.classList.toggle('filled')"></td>
+            </tr>
+            <tr>
+                <td class="hint row-hint">1, 1</td>
+                <td class="cell" onclick="this.classList.toggle('filled')"></td>
+                <td class="cell" onclick="this.classList.toggle('filled')"></td>
+                <td class="cell" onclick="this.classList.toggle('filled')"></td>
+                <td class="cell" onclick="this.classList.toggle('filled')"></td>
+                <td class="cell" onclick="this.classList.toggle('filled')"></td>
+            </tr>
+            <tr>
+                <td class="hint row-hint">3</td>
+                <td class="cell" onclick="this.classList.toggle('filled')"></td>
+                <td class="cell" onclick="this.classList.toggle('filled')"></td>
+                <td class="cell" onclick="this.classList.toggle('filled')"></td>
+                <td class="cell" onclick="this.classList.toggle('filled')"></td>
+                <td class="cell" onclick="this.classList.toggle('filled')"></td>
+            </tr>
+            <tr>
+                <td class="hint row-hint">1, 1</td>
+                <td class="cell" onclick="this.classList.toggle('filled')"></td>
+                <td class="cell" onclick="this.classList.toggle('filled')"></td>
+                <td class="cell" onclick="this.classList.toggle('filled')"></td>
+                <td class="cell" onclick="this.classList.toggle('filled')"></td>
+                <td class="cell" onclick="this.classList.toggle('filled')"></td>
+            </tr>
+            <tr>
+                <td class="hint row-hint">3</td>
+                <td class="cell" onclick="this.classList.toggle('filled')"></td>
+                <td class="cell" onclick="this.classList.toggle('filled')"></td>
+                <td class="cell" onclick="this.classList.toggle('filled')"></td>
+                <td class="cell" onclick="this.classList.toggle('filled')"></td>
+                <td class="cell" onclick="this.classList.toggle('filled')"></td>
+            </tr>
+        </table>
+    </div>
+
+    <p style="margin-top:20px;">
+        解开数织，观察涂黑的方块。<br>
+        提示：这些方块代表了5位二进制编码中的“1”。<br>
+        解码后，将答案填入网址后缀。
+    </p >
+
+</body>
+</html>
