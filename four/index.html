@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <title>To:</title>
+    <style>
+        body {
+            margin: 0;
+            background-color: #ffffff;
+            text-align: center;
+            font-family: "PingFang SC", "Microsoft YaHei", sans-serif;
+            padding: 60px 15px;
+            color: #333;
+        }
+
+        /* 首行日期样式 */
+        .date-header {
+            font-size: 20px;
+            letter-spacing: 1px;
+            margin-bottom: 50px;
+            font-weight: 300;
+        }
+
+        /* 图片纵向列表容器 */
+        .photo-story {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 40px; /* 图片之间的间距，增加一点呼吸感 */
+            max-width: 100%;
+        }
+
+        .photo-story img {
+            width: 95%;
+            max-width: 750px; /* 限制宽度，在电脑上看更有电影感 */
+            height: auto;
+            aspect-ratio: 16 / 9; /* 强制横图比例 */
+            object-fit: cover;
+            border-radius: 2px;
+            /* 淡淡的阴影，让照片像贴在白墙上 */
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05); 
+            display: block;
+        }
+
+        /* 最后一页的留白，增加结束感 */
+        .footer-space {
+            height: 100px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="date-header">
+        嗯
+    </div>
+
+    <div class="photo-story">
+        < img src="pic3.jpg">
+        < img src="pic4.jpg">
+        < img src="pic5.jpg">
+        < img src="pic6.jpg">
+        < img src="pic7.jpg">
+        < img src="pic8.jpg">
+    </div>
+
+    <div class="footer-space"></div>
+
+</body>
+</html>
