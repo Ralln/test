@@ -4,49 +4,76 @@
     <meta charset="UTF-8">
     <title>お誕生日おめでとう</title>
     <style>
-        /* 1. 全局样式：深黑色背景，纯白色文字 */
         body {
-            background-color: #121212;
-            color: #ffffff;
-            font-family: "PingFang SC", "Microsoft YaHei", "Hiragino Sans GB", "Meiryo", sans-serif;
+            background-color: #ffffff; /* 纯白背景，完美融合你的图片 */
+            color: #333333; /* 深灰色文字，比纯黑更柔和 */
+            font-family: "Helvetica Neue", Helvetica, "PingFang SC", "Microsoft YaHei", "Hiragino Sans GB", "Meiryo", sans-serif;
             text-align: center;
-            padding: 50px 20px;
-            line-height: 1.6;
+            padding: 60px 20px;
+            margin: 0;
         }
 
-        /* 2. 标题样式：加大字号，增加字间距 */
         h1 {
-            font-size: 2.5rem;
-            letter-spacing: 5px;
-            margin-bottom: 30px;
-            /* 加上淡紫色的发光效果，很有解谜氛围 */
-            text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+            font-size: 2.2rem;
+            font-weight: 300; /* 细体字更有高级感 */
+            letter-spacing: 4px;
+            margin-bottom: 40px;
+            color: #000;
         }
 
-        /* 3. 图片样式：加圆角和阴影，显得不那么生硬 */
+        .content-box {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
         img {
-            max-width: 90%;
-            border-radius: 12px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-            margin: 20px 0;
-            border: 1px solid #333;
+            max-width: 100%;
+            height: auto;
+            margin-bottom: 30px;
+            /* 如果图片边缘不明显，可以加一点点极淡的投影 */
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05); 
         }
 
-        /* 4. 提示文字样式：颜色稍淡，保持神秘感 */
-        p {
-            font-size: 1rem;
-            color: #cccccc;
-            margin-top: 40px;
+        .message {
+            font-size: 1.1rem;
+            line-height: 1.8;
+            margin-bottom: 50px;
+            color: #555;
+            text-align: left; /* 长文字左对齐更易读 */
+            display: inline-block; /* 配合居中父元素 */
+        }
+
+        .hint {
+            font-size: 0.9rem;
+            color: #999;
+            border-top: 1px dashed #eee;
+            padding-top: 20px;
         }
     </style>
 </head>
 <body>
 
-    <h1>祝你生日快乐</h1>
-    
-    <img src="picture1.png" alt="Happy Birthday">
-    
-    <p>修改网址后缀以进入下一关（加在最后一个/后面）<br>答案是五个小写字母</p >
+    <div class="content-box">
+        <h1>お誕生日おめでとう</h1>
+
+        < img src="picture1.png">
+
+        <div class="message">
+            你好，生日快乐！<br>
+            很抱歉我一直一直在逃避。<br>
+           做了这个网页，不知道你愿不愿意玩玩看<br><br>
+           不论如何<br>
+春天将要来到<br>
+祝你得到你期望得到的<br>
+祝你成为你想要成为的<br>
+祝你幸福快乐。<br>
+        </div>
+
+        <p class="hint">
+            修改网址后缀以进入下一关（加在/后面）<br>
+            答案是五个小写字母
+        </p >
+    </div>
 
 </body>
 </html>
