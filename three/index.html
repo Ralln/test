@@ -2,7 +2,7 @@
 <html lang="zh">
 <head>
     <meta charset="UTF-8">
-    <title>一扫而空</title>
+    <title>大扫除</title>
     <style>
         body { font-family: 'Courier New', monospace; background: #c0c0c0; text-align: center; padding-top: 20px; }
         
@@ -55,26 +55,27 @@
             font-size: 20px;
         }
 
-        /* 游戏网格 */
+        /* 游戏网格：修改为 20x35，格子大小调为 22px 以适应屏幕 */
         #grid {
             display: grid;
-            grid-template-columns: repeat(9, 30px);
-            grid-template-rows: repeat(9, 30px);
+            grid-template-columns: repeat(35, 22px);
+            grid-template-rows: repeat(20, 22px);
             border: 2px solid #7b7b7b;
             border-right-color: #fff;
             border-bottom-color: #fff;
         }
 
         .cell {
-            width: 30px;
-            height: 30px;
+            width: 22px;
+            height: 22px;
             background: #bdbdbd;
-            border: 3px solid #fff;
+            border: 2px solid #fff;
             border-right-color: #7b7b7b;
             border-bottom-color: #7b7b7b;
             box-sizing: border-box;
             cursor: pointer;
             font-weight: bold;
+            font-size: 13px; /* 缩小字号以适应小格子 */
             display: flex;
             align-items: center;
             justify-content: center;
@@ -92,6 +93,7 @@
         /* 数字颜色 */
         .n1 { color: blue; } .n2 { color: green; } .n3 { color: red; } 
         .n4 { color: darkblue; } .n5 { color: darkred; } .n6 { color: teal; }
+        .n7 { color: black; } .n8 { color: gray; }
     </style>
 </head>
 <body>
@@ -101,7 +103,7 @@
 
     <div id="game-container">
         <div id="status-bar">
-            <div id="mine-count" class="lcd-display">010</div>
+            <div id="mine-count" class="lcd-display">228</div>
             <div id="face" onclick="location.reload()">🙂</div>
             <div id="timer" class="lcd-display">000</div>
         </div>
@@ -109,9 +111,11 @@
     </div>
 
     <script>
-        const rows = 9;
-        const cols = 9;
-        const minesCount = 10;
+        // 修改为 20x35 和 228 颗雷
+        const rows = 20;
+        const cols = 35;
+        const minesCount = 228;
+        
         let mines = [];
         let revealedCount = 0;
         let flags = 0;
@@ -135,6 +139,7 @@
                 cell.addEventListener('contextmenu', (e) => e.preventDefault());
                 gridElement.appendChild(cell);
             }
+            // 初始化显示
             mineDisplay.innerText = minesCount.toString().padStart(3, '0');
         }
 
@@ -159,6 +164,7 @@
         }
 
         function startTimer() {
+            if (timerInterval) return; // 防止重复启动
             timerInterval = setInterval(() => {
                 timeElapsed++;
                 timerDisplay.innerText = Math.min(timeElapsed, 999).toString().padStart(3, '0');
@@ -167,7 +173,7 @@
 
         function generateMines(excludeIndex) {
             let positions = Array.from({length: rows * cols}, (_, i) => i);
-            positions = positions.filter(p => p !== excludeIndex); // 确保第一次点击不是雷
+            positions = positions.filter(p => p !== excludeIndex); 
             positions.sort(() => Math.random() - 0.5);
             mines = positions.slice(0, minesCount);
         }
@@ -183,7 +189,8 @@
                 cell.innerText = '🚩';
                 flags++;
             }
-            mineDisplay.innerText = Math.max(minesCount - flags, 0).toString().padStart(3, '0');
+            // 实时更新剩余雷数显示
+            mineDisplay.innerText = Math.max(minesCount - flags, -99).toString().padStart(3, '0').slice(-3);
         }
 
         function reveal(index) {
@@ -219,13 +226,13 @@
                 const cell = gridElement.children[m];
                 cell.classList.add('revealed');
                 cell.classList.add('mine');
-                cell.innerText = '💣';
+                if (cell.innerText !== '🚩') cell.innerText = '💣';
                 if (m === hitIndex) cell.classList.add('mine-hit');
             });
 
             if (won) {
                 face.innerText = '😎';
-                setTimeout(() => alert('vos'), 500);
+                setTimeout(() => alert('password：vos'), 500);
             } else {
                 face.innerText = '😵';
             }
